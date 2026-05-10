@@ -78,6 +78,15 @@ export default function App() {
     updateAppBadge(pendingRecurring + pendingCustom);
   }, [completedIds, customTasks]);
 
+  // Clear badge when app becomes visible
+  useEffect(() => {
+    function onVisibilityChange() {
+      if (document.visibilityState === 'visible') updateAppBadge(0);
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange);
+  }, []);
+
   // Supabase Realtime — live updates across devices
   useEffect(() => {
     if (!currentUser) return;
