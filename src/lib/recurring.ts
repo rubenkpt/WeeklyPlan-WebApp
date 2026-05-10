@@ -1,5 +1,6 @@
-import { getISOWeek, getISOWeekYear, subWeeks, nextFriday, isFriday, isAfter } from 'date-fns';
-import type { RecurringTask, UserName } from '../types';
+import { getISOWeek, getISOWeekYear, subWeeks, nextFriday, isFriday, isAfter, differenceInDays, addDays, parseISO } from 'date-fns';
+import type { CustomTask, RecurringTask, UserName } from '../types';
+import { RECURRENCE_DAYS } from '../types';
 
 export function getWeekKey(date: Date): string {
   const week = getISOWeek(date);
@@ -110,4 +111,18 @@ export function computeStreak(completedIds: Set<string>, userName: UserName): nu
 
 export function getCategoryEmoji(category: RecurringTask['category']): string {
   return { bathroom: '🚿', cleaning: '🧹', laundry: '👕' }[category];
+}
+
+// Returns true if a custom task is currently due (accounts for recurrence)
+export function isCustomTaskDue(task: CustomTask): boolean {
+  if (!task.recurrence) return !task.completed;
+  if (!task.completedAt) return true;
+  const daysSince = differenceInDays(new Date(), parseISO(task.completedAt));
+  return daysSince >= RECURRENCE_DAYS[task.recurrence];
+}
+
+// Returns the date when a recurring custom task is due again after completion
+export function nextRecurrenceDue(task: CustomTask): Date | null {
+  if (!task.recurrence || !task.completedAt) return null;
+  return addDays(parseISO(task.completedAt), RECURRENCE_DAYS[task.recurrence]);
 }

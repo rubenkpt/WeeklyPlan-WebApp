@@ -14,6 +14,20 @@ export const USER_EMOJIS: Record<UserName, string> = {
   Markus: '⚡',
 };
 
+export type Recurrence = 'weekly' | 'biweekly' | 'monthly';
+
+export const RECURRENCE_LABELS: Record<Recurrence, string> = {
+  weekly: 'Wöchentlich',
+  biweekly: '2-wöchentlich',
+  monthly: 'Monatlich',
+};
+
+export const RECURRENCE_DAYS: Record<Recurrence, number> = {
+  weekly: 7,
+  biweekly: 14,
+  monthly: 30,
+};
+
 export type RecurringTask = {
   id: string;
   title: string;
@@ -28,6 +42,7 @@ export type CustomTask = {
   title: string;
   assignedTo: UserName | 'all';
   deadline: string | null;
+  recurrence: Recurrence | null;
   completed: boolean;
   completedBy: string | null;
   completedAt: string | null;

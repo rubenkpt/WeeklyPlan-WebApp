@@ -1,6 +1,6 @@
 import { format, nextFriday, isFriday } from 'date-fns';
 import { de } from 'date-fns/locale';
-import { Check } from 'lucide-react';
+import { Check, BellRing } from 'lucide-react';
 import { getCategoryEmoji } from '../lib/recurring';
 import { USER_EMOJIS } from '../types';
 import type { RecurringTask, UserName } from '../types';
@@ -10,6 +10,7 @@ type Props = {
   completed: boolean;
   currentUser: UserName;
   onToggle: (task: RecurringTask, completed: boolean) => void;
+  onNudge?: (task: RecurringTask) => void;
 };
 
 const userBorderColors: Record<UserName, string> = {
@@ -36,9 +37,9 @@ function getFridayLabel(): string {
   return format(friday, 'EEE, d. MMM', { locale: de });
 }
 
-export default function RecurringTaskCard({ task, completed, currentUser, onToggle }: Props) {
+export default function RecurringTaskCard({ task, completed, currentUser, onToggle, onNudge }: Props) {
   const isOwn = task.assignedTo === currentUser;
-  const canToggle = isOwn;
+  const showNudge = !isOwn && !completed && !!onNudge;
 
   return (
     <div
@@ -47,14 +48,11 @@ export default function RecurringTaskCard({ task, completed, currentUser, onTogg
       }`}
     >
       <button
-        onClick={() => canToggle && onToggle(task, !completed)}
-        disabled={!canToggle}
+        onClick={() => isOwn && onToggle(task, !completed)}
+        disabled={!isOwn}
         className={`flex-shrink-0 w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all ${
-          completed
-            ? userCheckColors[task.assignedTo]
-            : `${userUncheckedColors[task.assignedTo]} bg-transparent`
-        } ${!canToggle ? 'opacity-40 cursor-default' : 'active:scale-90 cursor-pointer'}`}
-        aria-label={completed ? 'Als unerledigt markieren' : 'Als erledigt markieren'}
+          completed ? userCheckColors[task.assignedTo] : `${userUncheckedColors[task.assignedTo]} bg-transparent`
+        } ${!isOwn ? 'opacity-40 cursor-default' : 'active:scale-90 cursor-pointer'}`}
       >
         {completed && <Check size={14} strokeWidth={3} className="text-white" />}
       </button>
@@ -75,6 +73,17 @@ export default function RecurringTaskCard({ task, completed, currentUser, onTogg
           )}
         </div>
       </div>
+
+      {showNudge && (
+        <button
+          onClick={() => onNudge(task)}
+          className="flex-shrink-0 p-2 rounded-xl text-gray-600 hover:text-amber-400 active:scale-90 transition-all"
+          aria-label={`${task.assignedTo} erinnern`}
+          title={`${task.assignedTo} erinnern`}
+        >
+          <BellRing size={16} />
+        </button>
+      )}
     </div>
   );
 }
