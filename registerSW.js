@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/WeeklyPlan-WebApp/sw.js', { scope: '/WeeklyPlan-WebApp/' })})}
