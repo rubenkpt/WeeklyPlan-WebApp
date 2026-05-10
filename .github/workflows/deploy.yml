@@ -9,9 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    environment:
-      name: github-pages
-      url: https://${{ github.repository_owner }}.github.io/WeeklyPlan-WebApp/
     steps:
       - uses: actions/checkout@v4
 
